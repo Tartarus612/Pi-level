@@ -4,6 +4,11 @@
 import smbus
 import math
 import time
+import unicornhathd as unicorn
+
+
+#set up Unicorn Hat
+unicorn.brightness(1.0)
 
 # Power management registers
 power_mgmt_1 = 0x6b
@@ -58,7 +63,7 @@ Tau = 0.5                     # accelerometer noise time constant (seconds)
 Delta_t = 0.01                # sampling time (seconds)
 Alpha = Tau/(Tau + Delta_t)   # apportionment coefficient
 
-time_diff = 0.02
+time_diff = 0.04
 
 (gyro_scaled_x, gyro_scaled_y, gyro_scaled_z, accel_scaled_x, accel_scaled_y, accel_scaled_z) = read_all()
 
@@ -74,11 +79,11 @@ gyro_total_y = (last_y) - gyro_offset_y
 #print "{0:.4f} {1:.2f} {2:.2f} {3:.2f} {4:.2f} {5:.2f} {6:.2f}".format( time.time() - now, (last_x), gyro_total_x, (last_x), (last_y), gyro_total_y, (last_y))
 
 # Map servo rotation to MPU6050 orientation
-slope = .09
+slope = .15
 middle = 8
 
 while (True):
-    time.sleep(time_diff - 0.005) 
+    time.sleep(time_diff - 0.001) 
     
     (gyro_scaled_x, gyro_scaled_y, gyro_scaled_z, accel_scaled_x, accel_scaled_y, accel_scaled_z) = read_all()
     
@@ -100,4 +105,16 @@ while (True):
     roll = middle+int(slope*last_x)
     pitch = middle+int(slope*last_y)
     
-    print ("last_x = " + str(last_x) + " last_y = " + str(last_y) + " roll = " + str(roll) + " pitch = " + str(pitch))
+    #print ("last_x = " + str(last_x) + " last_y = " + str(last_y) + " roll = " + str(roll) + " pitch = " + str(pitch))
+    if(roll > 15):
+        roll = 15
+    if (roll < 0):
+        roll = 0
+    if (pitch > 15):
+        pitch = 15
+    if (pitch < 0):
+        pitch = 0
+        
+    unicorn.clear()
+    unicorn.set_pixel(roll, pitch, 255, 255, 255)
+    unicorn.show()
