@@ -25,8 +25,15 @@ accel_scale = 16384.0
 address = 0x68  # This is the address value read via the i2cdetect command
 
 def read_all():
-    raw_gyro_data = bus.read_i2c_block_data(address, 0x43, 6)
-    raw_accel_data = bus.read_i2c_block_data(address, 0x3b, 6)
+    success = False
+    while (success != True):
+        try:
+            raw_gyro_data = bus.read_i2c_block_data(address, 0x43, 6)
+            raw_accel_data = bus.read_i2c_block_data(address, 0x3b, 6)
+            success = True
+        except:
+            time.sleep(.002)
+            success = False
 
     gyro_scaled_x = twos_compliment((raw_gyro_data[0] << 8) + raw_gyro_data[1]) / gyro_scale
     gyro_scaled_y = twos_compliment((raw_gyro_data[2] << 8) + raw_gyro_data[3]) / gyro_scale
